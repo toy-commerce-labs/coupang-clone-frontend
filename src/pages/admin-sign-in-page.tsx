@@ -40,7 +40,7 @@ export default function AdminSignInPage() {
       const res = await fetch("/api/v1/admin/members/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ userId: email, password }),
       });
       const data = await res.json();
       if (data.data?.accessToken) {

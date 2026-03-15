@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { Plus, Edit, Trash2 } from "lucide-react";
+import { adminFetch } from "@/lib/admin-fetch";
 
 interface ProductItem {
   id: number;
@@ -23,7 +24,7 @@ export default function AdminProductsPage() {
     setApiError(null);
 
     try {
-      const res = await fetch("/api/v1/admin/products");
+      const res = await adminFetch("/api/v1/admin/products");
       const data = await res.json();
       if (res.ok) {
         setProducts(data.data ?? []);
@@ -38,13 +39,18 @@ export default function AdminProductsPage() {
   };
 
   useEffect(() => {
+    const token = sessionStorage.getItem("adminAccessToken");
+    if (!token) {
+      window.location.href = "/admin/sign-in";
+      return;
+    }
     fetchProducts();
   }, []);
 
   const deleteProduct = async (id: number) => {
     if (!confirm("정말로 이 상품을 삭제하시겠습니까?")) return;
     try {
-      const res = await fetch(`/api/v1/admin/products/${id}`, { method: "DELETE" });
+      const res = await adminFetch(`/api/v1/admin/products/${id}`, { method: "DELETE" });
       const data = await res.json();
       if (res.ok) {
         alert("상품 삭제 완료");

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { Package, Save } from "lucide-react";
+import { adminFetch } from "@/lib/admin-fetch";
 
 interface ProductForm {
   name: string;
@@ -33,11 +34,16 @@ export default function ProductFormPage() {
 
   // 상품 조회 (수정일 때)
   useEffect(() => {
+    const token = sessionStorage.getItem("adminAccessToken");
+    if (!token) {
+      window.location.href = "/admin/sign-in";
+      return;
+    }
     if (!isEdit) return;
 
     const fetchProduct = async () => {
       try {
-        const res = await fetch(`/api/v1/admin/products/${productId}`);
+        const res = await adminFetch(`/api/v1/admin/products/${productId}`);
         const data = await res.json();
         setProduct(data.data);
       } catch {
@@ -61,7 +67,7 @@ export default function ProductFormPage() {
     setApiError(null);
 
     try {
-      const res = await fetch(
+      const res = await adminFetch(
         isEdit
           ? `/api/v1/admin/products/${productId}`
           : `/api/v1/admin/products`,
